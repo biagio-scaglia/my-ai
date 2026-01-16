@@ -1,0 +1,5 @@
+rich
+transformers
+torch
+accelerate
+sentence-transformers

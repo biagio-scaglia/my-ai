@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Models (se scaricati localmente e non in cache HF)
+models/
+
+# Logs & System
+*.log
+.vscode/
+
+# User Private Data
+*CV*
+*.pdf
+private/
+knowledge/personal/

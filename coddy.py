@@ -20,12 +20,12 @@ def web_search(query, max_results=3):
     Esegue una ricerca web anonima usando DuckDuckGo.
     """
     try:
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
 
         results = []
-        with DDGS() as ddgs:
+        with DDGS() as ddgs_inst:
             # simple text search
-            ddgs_gen = ddgs.text(query, max_results=max_results)
+            ddgs_gen = ddgs_inst.text(query, max_results=max_results)
             for r in ddgs_gen:
                 results.append(f"[Fonte Web: {r['title']}]({r['href']})\n{r['body']}")
         return results
@@ -301,10 +301,10 @@ if __name__ == "__main__":
         if args.online:
             try:
                 console.print("[dim]🔍 One-Shot: Ricerca Web in corso...[/dim]")
-                import duckduckgo_search
+                import ddgs
 
-                with duckduckgo_search.DDGS() as ddgs:
-                    results = list(ddgs.text(cli_query, max_results=3))
+                with ddgs.DDGS() as ddgs_inst:
+                    results = list(ddgs_inst.text(cli_query, max_results=3))
                     if results:
                         context_extra = "\n\n=== DATI WEB ===\n" + "\n".join(
                             [f"- {r['title']}: {r['body']}" for r in results]

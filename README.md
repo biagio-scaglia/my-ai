@@ -61,13 +61,14 @@ python coddy.py "Come creo un array in C#?"
 python coddy.py --model light "Chi era Dante?"
 ```
 
-## 🧠 Come Addestrarlo (RAG)
+## 🧠 Knowledge Base (RAG con Qdrant)
 
-Coddy diventa intelligente leggendo i file nella cartella `knowledge/`.
+Coddy **NON** viene addestrato (fine-tuning). Usa una tecnica chiamata **RAG (Retrieval-Augmented Generation)**.
+I tuoi documenti vengono trasformati in vettori e salvati in un database locale veloce (**Qdrant**), permettendo a Coddy di trovare l'informazione giusta al momento giusto.
 
-1.  Apri la cartella `knowledge/`.
-2.  Crea o incolla file `.md` (Markdown) o `.txt`.
-3.  Al prossimo avvio, Coddy li "leggerà" e userà quelle informazioni per risponderti.
+1.  Metti i tuoi file `.md` o `.txt` nella cartella `knowledge/`.
+2.  All'avvio, Coddy aggiornerà automaticamente il database vettoriale.
+3.  Quando fai una domanda, lui cercherà i pezzi rilevanti e li userà per risponderti.
 
 **Esempi di file da aggiungere:**
 
@@ -80,6 +81,7 @@ Coddy diventa intelligente leggendo i file nella cartella `knowledge/`.
 - [Rich](https://github.com/Textualize/rich) - UI Terminale
 - [Hugging Face Transformers](https://huggingface.co/docs/transformers) - LLM Engine
 - [Sentence Transformers](https://sbert.net/) - RAG Embedding
+- [Qdrant](https://qdrant.tech/) - Vector Database Locale
 - [Qwen2.5](https://huggingface.co/Qwen) - Il modello LLM di base
 
 ---

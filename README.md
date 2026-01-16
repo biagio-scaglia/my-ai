@@ -59,6 +59,19 @@ Puoi fare una domanda diretta senza entrare nella chat:
 ```bash
 python coddy.py "Come creo un array in C#?"
 python coddy.py --model light "Chi era Dante?"
+python coddy.py --model light "Chi era Dante?"
+```
+
+### 4. 🌍 Ricerca Web (Online)
+
+Coddy può cercare su internet (tramite DuckDuckGo, **senza API Key**) se non trova risposte nei documenti locali.
+
+```bash
+# Avvio con ricerca online abilitata
+python coddy.py --online
+
+# One-Shot online
+python coddy.py --online "Prezzo Bitcoin oggi"
 ```
 
 ## 🧠 Knowledge Base (RAG con Qdrant)

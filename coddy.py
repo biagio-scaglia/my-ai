@@ -340,6 +340,8 @@ if __name__ == "__main__":
         # Output formattato su stdout per eventuale piping
         console.print(Markdown(response))
 
+        if rag and hasattr(rag, "close"):
+            rag.close()
         sys.exit(0)
 
     # Altrimenti avvia il loop interattivo

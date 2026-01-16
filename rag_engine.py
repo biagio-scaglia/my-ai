@@ -1,9 +1,6 @@
 import os
 import glob
 import uuid
-from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
-from qdrant_client.http import models
 
 
 class RagEngine:
@@ -15,126 +12,154 @@ class RagEngine:
     ):
         """
         Inizializza il motore RAG con Qdrant (Persistent Storage).
+        Usa Lazy Loading per le dipendenze pesanti.
         """
         self.knowledge_dir = knowledge_dir
         self.collection_name = "coddy_knowledge"
+        self.db_path = db_path
+        self.model_name = model_name
+        self.client = None
+        self.model = None
 
-        # Inizializza Qdrant Locale (File basato, niente server richiesto)
-        print(f"Inizializzazione Qdrant DB in: {db_path}...")
-        self.client = QdrantClient(path=db_path)
-
-        # Carica il modello di embedding
-        print(f"Caricamento modello Embedding: {model_name}...")
+        # Lazy Loading delle dipendenze
         try:
-            self.model = SentenceTransformer(model_name)
+            print(f"RAG: Importazione moduli pesanti (Lazy Loading)...")
+            from sentence_transformers import SentenceTransformer
+            from qdrant_client import QdrantClient
+            from qdrant_client.http import models
+
+            self.models = models
+
+            # Inizializza Qdrant Locale
+            print(f"RAG: Apertura DB in {self.db_path}...")
+            # Tentiamo di forzare la locazione in memoria se path è "memory" (opzionale)
+            self.client = QdrantClient(path=self.db_path)
+
+            # Carica Modello Embedding
+            print(f"RAG: Caricamento modello {self.model_name}...")
+            self.model = SentenceTransformer(self.model_name)
             self.embedding_size = self.model.get_sentence_embedding_dimension()
 
-            # Crea la collezione se non esiste
             self._ensure_collection()
-
-            # Indicizza i documenti
             self.load_knowledge()
-            print("Motore RAG (Qdrant) pronto.")
+            print("RAG: Sistema pronto.")
+
+        except ImportError as e:
+            print(
+                f"RAG Error: Modulo mancante ({e}). Esegui 'pip install -r requirements.txt'"
+            )
         except Exception as e:
-            print(f"Errore inizializzazione RAG: {e}")
-            self.client = None
+            print(f"RAG Error: Inizializzazione fallita ({e})")
+            # Fallback sicuro: client None
 
     def _ensure_collection(self):
-        """Assicura che la collezione Qdrant esista con la configurazione corretta."""
-        collections = self.client.get_collections()
-        exists = any(c.name == self.collection_name for c in collections.collections)
+        """Assicura che la collezione esista."""
+        if not self.client:
+            return
 
-        if not exists:
-            self.client.create_collection(
-                collection_name=self.collection_name,
-                vectors_config=models.VectorParams(
-                    size=self.embedding_size, distance=models.Distance.COSINE
-                ),
+        try:
+            collections = self.client.get_collections()
+            exists = any(
+                c.name == self.collection_name for c in collections.collections
             )
 
+            if not exists:
+                self.client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=self.models.VectorParams(
+                        size=self.embedding_size, distance=self.models.Distance.COSINE
+                    ),
+                )
+        except Exception as e:
+            print(f"RAG Init Collection Error: {e}")
+
     def load_knowledge(self):
-        """
-        Legge i file, crea embedding e li salva su Qdrant se non esistono.
-        Nota: Per ora è un approccio semplice (svuota e ricarica o upsert cieco).
-        Per produzione si dovrebbe usare hashing dei file per evitare ri-embedding.
-        """
-        print("Scansione documenti...")
+        """Indicizza i file."""
+        if not self.client:
+            return
+
         files = glob.glob(
             os.path.join(self.knowledge_dir, "**/*.md"), recursive=True
         ) + glob.glob(os.path.join(self.knowledge_dir, "**/*.txt"), recursive=True)
 
         if not files:
-            print("Nessun file trovato nella knowledge base.")
             return
 
-        # Recupera conteggio attuale per info
-        count_before = self.client.count(self.collection_name).count
+        try:
+            count_before = self.client.count(self.collection_name).count
+        except:
+            count_before = 0
 
-        # Batch processing
         batch_points = []
 
+        print("RAG: Scansione nuovi documenti...")
         for file_path in files:
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
                     text = f.read()
 
-                # Chunking per paragrafi
                 chunks = text.split("\n\n")
                 for chunk in chunks:
                     chunk = chunk.strip()
                     if not chunk:
                         continue
 
-                    # Genera ID univoco (deterministic basato sul contenuto per evitare duplicati esatti)
                     doc_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, chunk))
-
-                    # Calcola embedding
                     vector = self.model.encode(chunk).tolist()
 
-                    # Crea punto Qdrant
-                    point = models.PointStruct(
+                    point = self.models.PointStruct(
                         id=doc_id,
                         vector=vector,
                         payload={"text": chunk, "source": os.path.basename(file_path)},
                     )
                     batch_points.append(point)
-
             except Exception as e:
                 print(f"Errore lettura {file_path}: {e}")
 
         if batch_points:
-            # Upsert (inserisce o aggiorna)
-            self.client.upsert(
-                collection_name=self.collection_name, points=batch_points
-            )
-            count_after = self.client.count(self.collection_name).count
-            new_elements = count_after - count_before
-            print(
-                f"Knowledge Base aggiornata. Totale frammenti: {count_after} (+{new_elements} nuovi)."
-            )
+            try:
+                self.client.upsert(
+                    collection_name=self.collection_name, points=batch_points
+                )
+                count_after = self.client.count(self.collection_name).count
+                if count_after > count_before:
+                    print(
+                        f"RAG: +{count_after - count_before} nuovi frammenti indicizzati."
+                    )
+            except Exception as e:
+                print(f"RAG Upsert Error: {e}")
 
     def search(self, query, top_k=3):
-        """
-        Cerca i frammenti più rilevanti usando la ricerca vettoriale di Qdrant.
-        """
+        """Esegue la ricerca vettoriale."""
         if not self.client:
             return []
 
-        query_vector = self.model.encode(query).tolist()
+        try:
+            query_vector = self.model.encode(query).tolist()
 
-        search_result = self.client.search(
-            collection_name=self.collection_name, query_vector=query_vector, limit=top_k
-        )
+            # --- FIX CRITICO ---
+            # QdrantClient su alcune versioni/config locali potrebbe non esporre .search
+            # Usiamo query_points che è l'API standard più robusta
+            search_result = self.client.query_points(
+                collection_name=self.collection_name, query=query_vector, limit=top_k
+            ).points
 
-        results = []
-        for hit in search_result:
-            if hit.score > 0.45:  # Soglia di rilevanza
-                results.append(
-                    {
-                        "text": hit.payload["text"],
-                        "source": hit.payload["source"],
-                        "score": hit.score,
-                    }
-                )
+            results = []
+            for hit in search_result:
+                if hit.score > 0.45:
+                    results.append(
+                        {
+                            "text": hit.payload["text"],
+                            "source": hit.payload["source"],
+                            "score": hit.score,
+                        }
+                    )
+            return results
+        except Exception as e:
+            print(f"RAG Search Error (final try): {e}")
+            return []
 
-        return results
+    def close(self):
+        """Chiude la connessione al DB in modo pulito."""
+        if self.client:
+            self.client.close()

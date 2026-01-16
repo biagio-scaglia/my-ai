@@ -4,4 +4,4 @@ torch
 accelerate
 sentence-transformers
 qdrant-client
-duckduckgo-search
+ddgs

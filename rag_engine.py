@@ -162,4 +162,14 @@ class RagEngine:
     def close(self):
         """Chiude la connessione al DB in modo pulito."""
         if self.client:
-            self.client.close()
+            try:
+                # Evita errori se Python sta chiudendo (sys.meta_path None)
+                import sys
+
+                if sys.meta_path is None:
+                    return
+                self.client.close()
+            except:
+                pass
+            finally:
+                self.client = None

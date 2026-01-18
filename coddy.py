@@ -213,6 +213,31 @@ def chat_loop(engine, rag, enable_online=False):
     finally:
         console.print("[dim]Spegnimento motori...[/dim]")
 
+        # Pulizia robusta anti-errori shutdown
+        if rag:
+            try:
+                rag.close()
+            except:
+                pass
+
+        if engine:
+            try:
+                engine.close()
+            except:
+                pass
+
+        # Dereferenziazione esplicita per evitare che __del__
+        # venga chiamato quando i moduli sono già distrutti
+        rag = None
+        engine = None
+
+        # Forza Garbage Collection per pulire subito
+        import gc
+
+        gc.collect()
+
+        sys.exit(0)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

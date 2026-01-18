@@ -17,7 +17,8 @@ Sfrutta la **Quantizzazione (GGUF)** e un'architettura **"Dual Brain"** per esse
 - **📚 RAG Persistente**: Memoria a lungo termine su disco (Qdrant) che non satura la RAM.
 - **🌍 Web Search**: Cerca su DuckDuckGo se la knowledge base locale non basta.
 - **🌊 Streaming Matrix UI**: Codice colorato e formattato in tempo reale con `Rich`.
-- **💻 CLI Potenziata**: Comandi `cls`, `exit` e status indicator intelligenti.
+- **💻 CLI Potenziata**: Comandi `help`, `cls`, `exit` e status indicator intelligenti.
+- **🇮🇹 Italiano Nativo**: System prompt sintonizzato per risposte rigorosamente in italiano.
 
 ---
 

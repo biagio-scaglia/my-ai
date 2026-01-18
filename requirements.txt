@@ -4,4 +4,7 @@ torch
 accelerate
 sentence-transformers
 qdrant-client
+qdrant-client
 ddgs
+llama-cpp-python
+huggingface_hub

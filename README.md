@@ -1,102 +1,82 @@
-# Coddy - Il tuo Assistente di Programmazione Locale
+# ⚡ Coddy v2.0 "Godmode"
 
-Coddy è un assistente AI da terminale, progettato per girare interamente in locale sul tuo computer.
-Usa un LLM specializzato (**Qwen2.5-Coder-1.5B**) per il coding e un sistema **RAG (Retrieval-Augmented Generation)** per imparare dai tuoi documenti personali.
+> **L'Assistente AI locale che gira sul metallo.**
+> Nessuna cloud, nessuna API Key, pura potenza CPU su privacy assoluta.
 
-## ✨ Caratteristiche "Godmode"
+Coddy è un assistente di programmazione avanzato progettato per hardware consumer (i7 + 32GB RAM).
+Sfrutta la **Quantizzazione (GGUF)** e un'architettura **"Dual Brain"** per essere leggero come una piuma ma intelligente come un Coder.
 
-- **🧠 Doppio Cervello**:
-  - **Coder (1.5B)**: Specializzato in scrittura codice, refactoring e architettura.
-  - **Light (0.5B)**: Per chat veloci e domande teoriche.
-- **⚡ CLI One-Shot**: Chiedi direttamente da terminale senza aprire la chat interattiva.
-- **� File Generator**: Crea file automaticamente ("Creami un main.py") con protezione sovrascrittura.
-- **�📚 RAG Autonomo**: Impara dai tuoi file e risponde contestualmente.
-- **🇮🇹 Assistant Nativo**: Risposte e commenti al codice rigorosamente in Italiano.
+---
 
-## 🚀 Installazione Rapida
+## 🚀 Caratteristiche Godmode
 
-1.  **Requisiti**: Python 3.8+ & Git.
-2.  **Setup**:
-    ```bash
-    pip install -r requirements.txt
-    python download_models.py
-    ```
-    _(Scaricherà entrambi i modelli: Coder & Light)_
+- **🏎️ Motore C++ Nativo**: Passaggio da Python lento a `llama.cpp` ottimizzato per Intel/AMD.
+- **🧠 Dual Brain**:
+  - **Light (0.5B)**: Risposte istantanee per teoria e chiacchiere.
+  - **Coder (1.5B)**: Si attiva _solo_ quando serve scrivere codice complesso.
+- **📚 RAG Persistente**: Memoria a lungo termine su disco (Qdrant) che non satura la RAM.
+- **🌍 Web Search**: Cerca su DuckDuckGo se la knowledge base locale non basta.
+- **🌊 Streaming**: Output in tempo reale stile "Matrix".
 
-## 🎮 Utilizzo Avanzato
+---
 
-### 1. Chat Interattiva (Default: Coder)
+## 🛠️ Installazione (Solo 2 Comandi)
+
+### 1. Preparazione
+
+Assicurati di avere Python 3.10+ installato.
+
+```bash
+pip install -r requirements.txt
+python setup.py
+```
+
+_(Questo scaricherà ~1.5GB di modelli ottimizzati nella cartella `models/`)_
+
+---
+
+## 🎮 Utilizzo
+
+### Chat Interattiva
+
+La modalità classica. Coddy ricorda la conversazione.
 
 ```bash
 python coddy.py
 ```
 
-Coddy si avvia, indicizza la tua `knowledge/` e aspetta i tuoi ordini.
+### One-Shot (Domanda Rapida)
 
-### 2. Cambio Modello
-
-Coddy supporta due "cervelli":
-
-- **Coder** (Default): `Qwen2.5-Coder-1.5B` - Ottimo per scrivere codice.
-- **Light**: `Qwen2.5-0.5B` - Leggerissimo, per chat veloci.
-
-Per cambiare modello all'avvio:
+Perfetto per risposte al volo senza entrare nel loop.
 
 ```bash
-python coddy.py --model light
+python coddy.py "Come faccio un foreach in Rust?"
 ```
 
-O per tornare al coder:
+### Modalità Online
+
+Permette a Coddy di cercare su internet.
 
 ```bash
-python coddy.py --model coder
-```
-
-### 3. Query Rapide (One-Shot)
-
-Puoi fare una domanda diretta senza entrare nella chat:
-
-```bash
-python coddy.py "Come creo un array in C#?"
-python coddy.py --model light "Chi era Dante?"
-python coddy.py --model light "Chi era Dante?"
-```
-
-### 4. 🌍 Ricerca Web (Online)
-
-Coddy può cercare su internet (tramite DuckDuckGo, **senza API Key**) se non trova risposte nei documenti locali.
-
-```bash
-# Avvio con ricerca online abilitata
 python coddy.py --online
-
-# One-Shot online
-python coddy.py --online "Prezzo Bitcoin oggi"
 ```
-
-## 🧠 Knowledge Base (RAG con Qdrant)
-
-Coddy **NON** viene addestrato (fine-tuning). Usa una tecnica chiamata **RAG (Retrieval-Augmented Generation)**.
-I tuoi documenti vengono trasformati in vettori e salvati in un database locale veloce (**Qdrant**), permettendo a Coddy di trovare l'informazione giusta al momento giusto.
-
-1.  Metti i tuoi file `.md` o `.txt` nella cartella `knowledge/`.
-2.  All'avvio, Coddy aggiornerà automaticamente il database vettoriale.
-3.  Quando fai una domanda, lui cercherà i pezzi rilevanti e li userà per risponderti.
-
-**Esempi di file da aggiungere:**
-
-- Il tuo `CV.md` (già incluso!)
-- Appunti di progetti (`progetto_x.md`)
-- Guide specifiche o documentazione tecnica.
-
-## 🛠️ Tecnologie
-
-- [Rich](https://github.com/Textualize/rich) - UI Terminale
-- [Hugging Face Transformers](https://huggingface.co/docs/transformers) - LLM Engine
-- [Sentence Transformers](https://sbert.net/) - RAG Embedding
-- [Qdrant](https://qdrant.tech/) - Vector Database Locale
-- [Qwen2.5](https://huggingface.co/Qwen) - Il modello LLM di base
 
 ---
 
-_Fatto con ❤️ da Biagio_
+## 🗂️ Knowledge Base (RAG)
+
+Vuoi che Coddy impari qualcosa di nuovo?
+
+1. Crea un file `.md` o `.txt` nella cartella `knowledge/`.
+2. Incollaci dentro documentazione, appunti o snippet.
+3. Avvia Coddy. **Fatto.** (Impara automaticamente all'avvio).
+
+---
+
+## ⚙️ Requisiti Tecnici
+
+- **CPU**: Intel i5/i7 (11th gen+) o AMD Ryzen 5/7 (5000+).
+- **RAM**: Almeno 16GB (32GB raccomandati per il Godmode fluido).
+- **GPU**: Non richiesta (ma supportata se presente).
+
+_Creato per girare 100% Offline e Privato. I tuoi dati restano sul tuo PC._

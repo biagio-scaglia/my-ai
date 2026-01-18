@@ -192,7 +192,8 @@ def chat_loop(engine, rag, enable_online=False):
             full_response = ""
 
             # Pannello Live
-            with Live(Markdown(""), refresh_per_second=15, console=console) as live:
+            # Refresh rate ridotto per evitare flickering su Windows CMD
+            with Live(Markdown(""), refresh_per_second=8, console=console) as live:
                 try:
                     stream_gen = engine.stream_chat(history, model_type=current_model)
                     for chunk in stream_gen:

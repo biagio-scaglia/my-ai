@@ -63,6 +63,14 @@ Permette a Coddy di cercare su internet.
 python coddy.py --online
 ```
 
+## 🌐 Web Interface (Nuovo!)
+
+Preferisci un'interfaccia grafica stile ChatGPT?
+
+```bash
+streamlit run app.py
+```
+
 ---
 
 ## 🗂️ Knowledge Base (RAG)

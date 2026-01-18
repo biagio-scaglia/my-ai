@@ -8,3 +8,4 @@ qdrant-client
 ddgs
 llama-cpp-python
 huggingface_hub
+streamlit

@@ -24,8 +24,20 @@ class CoddyEngine2:
         )
         self.path_light = os.path.join(model_dir, "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf")
 
-        self.llm_coder = None
         self.llm_light = None
+
+    def close(self):
+        """Libera la memoria dei modelli."""
+        if self.llm_coder:
+            del self.llm_coder
+            self.llm_coder = None
+        if self.llm_light:
+            del self.llm_light
+            self.llm_light = None
+        # Force garbage collection
+        import gc
+
+        gc.collect()
 
         # Carica i modelli (Lazy load nel metodo start per gestire errori gracefully)
 

@@ -103,6 +103,10 @@ def chat_loop(engine, rag, enable_online=False):
 
     history = [{"role": "system", "content": base_system_prompt}]
 
+    # Setup Live display styling
+    from rich.live import Live
+    from rich.markdown import Markdown
+
     try:
         while True:
             try:
@@ -111,8 +115,20 @@ def chat_loop(engine, rag, enable_online=False):
                 console.print("\n[bold blue]Uscita...[/bold blue]")
                 break
 
+            # Comandi speciali
             if user_input.lower() in ["exit", "esci", "quit"]:
                 break
+            if user_input.lower() in ["cls", "clear", "pulisci"]:
+                console.clear()
+                console.print(
+                    Panel.fit(
+                        f"[bold blue]Coddy AI v2.0[/bold blue]\n[dim]Dual Brain: AUTO[/dim]\nOnline: {'[green]ON[/green]' if enable_online else '[dim]OFF[/dim]'}",
+                        title="Ready",
+                        border_style="green",
+                    )
+                )
+                continue
+
             if not user_input.strip():
                 continue
 
@@ -146,31 +162,40 @@ def chat_loop(engine, rag, enable_online=False):
 
             history.append({"role": "user", "content": full_input})
 
-            # Generazione Streaming
-            console.print("[bold blue]Coddy[/bold blue]: ", end="")
+            # Generazione Streaming con Rich Live (Migliora stile codice)
+            console.print("[bold blue]Coddy[/bold blue]:")
 
-            full_response = ""
             current_model = engine.route_query(full_input)
+            full_response = ""
 
-            # Usiamo Live display per lo streaming pulito o print diretto
-            # Qui usiamo print diretto con flush per semplicità e velocità
-            try:
-                stream_gen = engine.stream_chat(history, model_type=current_model)
-                for chunk in stream_gen:
-                    if chunk:
-                        print(chunk, end="", flush=True)
-                        full_response += chunk
-                print()  # Newline finale
-            except Exception as e:
-                console.print(f"\n[red]Errore generazione: {e}[/red]")
+            # Pannello Live che stream markdown
+            with Live(Markdown(""), refresh_per_second=12, console=console) as live:
+                try:
+                    stream_gen = engine.stream_chat(history, model_type=current_model)
+                    for chunk in stream_gen:
+                        if chunk:
+                            full_response += chunk
+                            live.update(Markdown(full_response))
+                except Exception as e:
+                    console.print(f"\n[red]Errore generazione: {e}[/red]")
 
+            # Aggiungi alla history
             history.append({"role": "assistant", "content": full_response})
 
     except KeyboardInterrupt:
         pass
     finally:
+        # Pulizia esplicita per evitare errori __del__
         if rag:
-            rag.close()
+            try:
+                rag.close()
+            except:
+                pass
+        if engine:
+            try:
+                engine.close()
+            except:
+                pass
         sys.exit(0)
 
 

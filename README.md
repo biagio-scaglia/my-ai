@@ -16,11 +16,12 @@ Sfrutta la **Quantizzazione (GGUF)** e un'architettura **"Dual Brain"** per esse
   - **Coder (1.5B)**: Si attiva _solo_ quando serve scrivere codice complesso.
 - **📚 RAG Persistente**: Memoria a lungo termine su disco (Qdrant) che non satura la RAM.
 - **🌍 Web Search**: Cerca su DuckDuckGo se la knowledge base locale non basta.
-- **🌊 Streaming**: Output in tempo reale stile "Matrix".
+- **🌊 Streaming Matrix UI**: Codice colorato e formattato in tempo reale con `Rich`.
+- **💻 CLI Potenziata**: Comandi `cls`, `exit` e status indicator intelligenti.
 
 ---
 
-## 🛠️ Installazione (Solo 2 Comandi)
+## 🛠️ Installazione (2 Comandi)
 
 ### 1. Preparazione
 

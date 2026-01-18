@@ -110,7 +110,7 @@ class CoddyEngine2:
             target = model_type
 
         llm = self.llm_coder if target == "coder" else self.llm_light
-        print(f"[DEBUG] Usando modello: {target.upper()}")
+        # print(f"[DEBUG] Usando modello: {target.upper()}")
 
         # Llama.cpp chat format
         # Converte history se necessario, ma llama.cpp .create_chat_completion accetta dict

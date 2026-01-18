@@ -107,12 +107,20 @@ def chat_loop(engine, rag, enable_online=False):
     from rich.live import Live
     from rich.markdown import Markdown
 
+    from rich.box import ROUNDED
+    from rich.rule import Rule
+
+    # Custom startup banner
+    console.print(Rule("[bold green]System Init[/bold green]", style="green"))
+
     try:
         while True:
             try:
-                user_input = Prompt.ask("\n[bold green]Tu[/bold green]")
+                # Spaziatura e Prompt Utente
+                console.print()
+                user_input = Prompt.ask("[bold green]👤 Tu[/bold green]")
             except KeyboardInterrupt:
-                console.print("\n[bold blue]Uscita...[/bold blue]")
+                console.print("\n[bold blue]👋 Uscita...[/bold blue]")
                 break
 
             # Comandi speciali
@@ -123,8 +131,9 @@ def chat_loop(engine, rag, enable_online=False):
                 console.print(
                     Panel.fit(
                         f"[bold blue]Coddy AI v2.0[/bold blue]\n[dim]Dual Brain: AUTO[/dim]\nOnline: {'[green]ON[/green]' if enable_online else '[dim]OFF[/dim]'}",
-                        title="Ready",
+                        title="✨ Godmode Active",
                         border_style="green",
+                        box=ROUNDED,
                     )
                 )
                 continue
@@ -132,15 +141,23 @@ def chat_loop(engine, rag, enable_online=False):
             if not user_input.strip():
                 continue
 
+            # Separatore visuale
+            console.print(Rule(style="dim"))
+
             # 1. Retrieval RAG
             rag_results = []
-            with console.status("[dim]RAG Scanning...[/dim]", spinner="dots"):
+            with console.status(
+                "[bold magenta]🧠 Analisi Memoria (RAG)...[/bold magenta]",
+                spinner="dots",
+            ):
                 rag_results = rag.search(user_input)
 
             # 2. Web Search (opzionale)
             web_results = []
             if enable_online:
-                with console.status("[dim]Web Search...[/dim]", spinner="earth"):
+                with console.status(
+                    "[bold cyan]🌐 Scansione Web...[/bold cyan]", spinner="earth"
+                ):
                     web_results = web_search(user_input)
 
             # Costruzione prompt
@@ -149,12 +166,16 @@ def chat_loop(engine, rag, enable_online=False):
                 context_parts.append("=== KNOWLEDGE BASE ===")
                 for r in rag_results:
                     context_parts.append(f"{r['text']}")
-                console.print(f"[dim]📚 RAG: {len(rag_results)} frammenti[/dim]")
+                console.print(
+                    f"   [dim]📚 Trovati {len(rag_results)} frammenti locali[/dim]"
+                )
 
             if web_results:
                 context_parts.append("=== WEB RESULTS ===")
                 context_parts.extend(web_results)
-                console.print(f"[dim]🌐 Web: {len(web_results)} risultati[/dim]")
+                console.print(
+                    f"   [dim]🌐 Trovati {len(web_results)} risultati web[/dim]"
+                )
 
             full_input = user_input
             if context_parts:
@@ -162,14 +183,16 @@ def chat_loop(engine, rag, enable_online=False):
 
             history.append({"role": "user", "content": full_input})
 
-            # Generazione Streaming con Rich Live (Migliora stile codice)
-            console.print("[bold blue]Coddy[/bold blue]:")
-
+            # Generazione Streaming
             current_model = engine.route_query(full_input)
+            model_label = "CODER (1.5B)" if current_model == "coder" else "LIGHT (0.5B)"
+            console.print(f"[dim]⚡ Engine: {model_label}[/dim]")
+            console.print("[bold blue]🤖 Coddy[/bold blue]:")
+
             full_response = ""
 
-            # Pannello Live che stream markdown
-            with Live(Markdown(""), refresh_per_second=12, console=console) as live:
+            # Pannello Live
+            with Live(Markdown(""), refresh_per_second=15, console=console) as live:
                 try:
                     stream_gen = engine.stream_chat(history, model_type=current_model)
                     for chunk in stream_gen:
@@ -179,24 +202,16 @@ def chat_loop(engine, rag, enable_online=False):
                 except Exception as e:
                     console.print(f"\n[red]Errore generazione: {e}[/red]")
 
+            # Newline finale e separatore
+            console.print(Rule(style="dim"))
+
             # Aggiungi alla history
             history.append({"role": "assistant", "content": full_response})
 
     except KeyboardInterrupt:
         pass
     finally:
-        # Pulizia esplicita per evitare errori __del__
-        if rag:
-            try:
-                rag.close()
-            except:
-                pass
-        if engine:
-            try:
-                engine.close()
-            except:
-                pass
-        sys.exit(0)
+        console.print("[dim]Spegnimento motori...[/dim]")
 
 
 if __name__ == "__main__":

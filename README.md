@@ -1,4 +1,4 @@
-# ⚡ Coddy v2.0 "Godmode"
+# ⚡ Coddy v2.1 "Godmode Enhanced"
 
 > **L'Assistente AI locale che gira sul metallo.**
 > Nessuna cloud, nessuna API Key, pura potenza CPU su privacy assoluta.
@@ -14,6 +14,8 @@ Sfrutta la **Quantizzazione (GGUF)** e un'architettura **"Dual Brain"** per esse
 - **🧠 Dual Brain**:
   - **Light (0.5B)**: Risposte istantanee per teoria e chiacchiere.
   - **Coder (1.5B)**: Si attiva _solo_ quando serve scrivere codice complesso.
+- **⚙️ Auto-Tuning Profiler**: Si calibra automaticamente sul tuo hardware (CPU/RAM) per massime performance.
+- **👁️ Mini LSP (Code Awareness)**: "Vede" il tuo progetto e capisce lo stack senza bisogno di spiegazioni.
 - **📚 RAG Persistente**: Memoria a lungo termine su disco (Qdrant) che non satura la RAM.
 - **🌍 Web Search**: Cerca su DuckDuckGo se la knowledge base locale non basta.
 - **🌊 Streaming Matrix UI**: Codice colorato e formattato in tempo reale con `Rich`.

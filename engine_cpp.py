@@ -9,14 +9,28 @@ except ImportError:
 
 
 class CoddyEngine2:
-    def __init__(self, model_dir="models", n_ctx=8192, n_threads=10):
+    def __init__(self, model_dir="models"):
         """
         Motore v2.0 basato su llama.cpp.
         Gestisce DUE modelli in RAM simultaneamente (Godmode).
+        Auto-Tuning powered by HardwareProfiler.
         """
+        from src.profiler import HardwareProfiler
+        from src.context_awareness import ContextAwareness
+
+        # Load Hardware Profile
+        self.profiler = HardwareProfiler()
+        self.config = self.profiler.get_config()
+
+        # Init Context Awareness
+        self.scanner = ContextAwareness()
+        self.project_context = self.scanner.get_system_prompt_injection()
+        print(f"👁️ [Mini LSP] {self.scanner.stack_summary}")
+
         self.model_dir = model_dir
-        self.n_ctx = n_ctx
-        self.n_threads = n_threads
+        self.n_ctx = self.config["n_ctx"]
+        self.n_threads = self.config["cpu_threads"]
+        self.n_batch = self.config["n_batch"]
 
         # Paths
         self.path_coder = os.path.join(
@@ -53,6 +67,7 @@ class CoddyEngine2:
             model_path=self.path_coder,
             n_ctx=self.n_ctx,
             n_threads=self.n_threads,
+            n_batch=self.n_batch,
             verbose=False,
         )
 
@@ -61,6 +76,7 @@ class CoddyEngine2:
             model_path=self.path_light,
             n_ctx=self.n_ctx // 2,  # Contesto minore per il light
             n_threads=self.n_threads,
+            n_batch=self.n_batch,
             verbose=False,
         )
         print("✅ [Godmode] Doppio Cervello Attivo (RAM OK).")
@@ -101,8 +117,26 @@ class CoddyEngine2:
         Genera risposta in streaming.
         model_type: 'auto', 'coder', 'light'
         """
-        # Parsing ultima query per routing
-        last_msg = history[-1]["content"]
+        # Inject Context into System Prompt
+        working_history = [msg.copy() for msg in history]
+
+        if self.project_context:
+            # Check if system message exists
+            if working_history[0]["role"] == "system":
+                if "[CONTEXT AWARENESS]" not in working_history[0]["content"]:
+                    working_history[0]["content"] += self.project_context
+            else:
+                # Insert system message
+                working_history.insert(
+                    0,
+                    {
+                        "role": "system",
+                        "content": "You are Coddy." + self.project_context,
+                    },
+                )
+
+        # Parse ultima query
+        last_msg = working_history[-1]["content"]
 
         if model_type == "auto":
             target = self.route_query(last_msg)
@@ -113,9 +147,8 @@ class CoddyEngine2:
         # print(f"[DEBUG] Usando modello: {target.upper()}")
 
         # Llama.cpp chat format
-        # Converte history se necessario, ma llama.cpp .create_chat_completion accetta dict
         stream = llm.create_chat_completion(
-            messages=history,
+            messages=working_history,
             max_tokens=2048,
             temperature=0.4 if target == "coder" else 0.7,
             stream=True,

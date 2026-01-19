@@ -1,0 +1,7 @@
+{
+    "cpu_threads": 12,
+    "ram_gb": 31.7,
+    "n_ctx": 16384,
+    "n_batch": 1024,
+    "gpu_offload": false
+}

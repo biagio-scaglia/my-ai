@@ -1,5 +1,4 @@
 import os
-import sys
 
 try:
     from llama_cpp import Llama
@@ -152,6 +151,7 @@ class CoddyEngine2:
             max_tokens=2048,
             temperature=0.4 if target == "coder" else 0.7,
             stream=True,
+            stop=["<|im_end|>", "<|endoftext|>"],
         )
 
         for chunk in stream:

@@ -1,7 +1,6 @@
 import os
 import json
 import psutil
-import platform
 
 PROFILE_PATH = "coddy_profile.json"
 
@@ -69,7 +68,7 @@ class HardwareProfiler:
                         f"⚡ [Profiler] Caricamento profilo esistente da {PROFILE_PATH}"
                     )
                     return json.load(f)
-            except:
+            except Exception:
                 pass
 
         print("⚡ [Profiler] Primo avvio: Analisi Hardware in corso...")

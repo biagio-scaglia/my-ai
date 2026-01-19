@@ -66,9 +66,11 @@ python coddy.py --online
 ## 🌐 Web Interface (Nuovo!)
 
 Preferisci un'interfaccia grafica stile ChatGPT?
+Ora con **Premium Dark Mode**, supporto RAG visuale e stato del sistema in tempo reale.
 
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
+
 ```
 
 ---

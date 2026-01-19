@@ -23,7 +23,7 @@ class RagEngine:
 
         # Lazy Loading delle dipendenze
         try:
-            print(f"RAG: Importazione moduli pesanti (Lazy Loading)...")
+            # print(f"RAG: Importazione moduli pesanti (Lazy Loading)...")
             from sentence_transformers import SentenceTransformer
             from qdrant_client import QdrantClient
             from qdrant_client.http import models
@@ -31,18 +31,18 @@ class RagEngine:
             self.models = models
 
             # Inizializza Qdrant Locale
-            print(f"RAG: Apertura DB in {self.db_path}...")
+            # print(f"RAG: Apertura DB in {self.db_path}...")
             # Tentiamo di forzare la locazione in memoria se path è "memory" (opzionale)
             self.client = QdrantClient(path=self.db_path)
 
             # Carica Modello Embedding
-            print(f"RAG: Caricamento modello {self.model_name}...")
+            # print(f"RAG: Caricamento modello {self.model_name}...")
             self.model = SentenceTransformer(self.model_name)
             self.embedding_size = self.model.get_sentence_embedding_dimension()
 
             self._ensure_collection()
             self.load_knowledge()
-            print("RAG: Sistema pronto.")
+            # print("RAG: Sistema pronto.")
 
         except ImportError as e:
             print(

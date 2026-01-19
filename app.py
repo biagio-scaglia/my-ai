@@ -38,32 +38,14 @@ st.markdown(
         border-right: 1px solid #30363D;
     }
     
-    /* CHAT MESSAGES REDESIGN */
+    /* CHAT MESSAGES REDESIGN - REVERTED TO CLASSIC */
     .stChatMessage {
-        background-color: transparent;
-        border: none;
+        background-color: #262730;
+        border-radius: 12px;
+        border: 1px solid #3E3E3E;
     }
-    
-    /* User Message Bubble */
-    .stChatMessage[data-testid="stChatMessage"]:nth-child(odd) div[data-testid="stMarkdownContainer"] {
-        background-color: #238636; /* Green accent */
-        color: white;
-        padding: 15px;
-        border-radius: 20px 20px 5px 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        text-align: right;
-        margin-left: 20%;
-    }
-    
-    /* AI Message Bubble */
-    .stChatMessage[data-testid="stChatMessage"]:nth-child(even) div[data-testid="stMarkdownContainer"] {
-        background-color: #1F2428; /* Dark card */
-        color: #E6EDF3;
-        padding: 15px;
-        border-radius: 20px 20px 20px 5px;
-        border: 1px solid #30363D;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-right: 10%;
+    .stChatMessage[data-testid="stChatMessage"]:nth-child(odd) {
+        background-color: #1E1E1E;
     }
     
     /* INPUT FIELD FLOATING */

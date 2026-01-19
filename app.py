@@ -63,7 +63,7 @@ def load_engine():
     """
     # Silenzia stdout durante importazione per pulizia CLI
     original_stdout = sys.stdout
-    sys.stdout = open(os.devnull, "w")
+    sys.stdout = open(os.devnull, "w", encoding="utf-8")
 
     try:
         from engine_cpp import CoddyEngine2

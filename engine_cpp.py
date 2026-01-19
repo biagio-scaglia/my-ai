@@ -48,7 +48,7 @@ class CoddyEngine2:
                 "Modelli GGUF non trovati in 'models/'. Esegui download_models_gguf.py"
             )
 
-        print("⚡ [Engine v2] Caricamento CODER (1.5B)...")
+        print("[Engine v2] Caricamento CODER (1.5B)...")
         self.llm_coder = Llama(
             model_path=self.path_coder,
             n_ctx=self.n_ctx,
@@ -56,7 +56,7 @@ class CoddyEngine2:
             verbose=False,
         )
 
-        print("⚡ [Engine v2] Caricamento LIGHT (0.5B)...")
+        print("[Engine v2] Caricamento LIGHT (0.5B)...")
         self.llm_light = Llama(
             model_path=self.path_light,
             n_ctx=self.n_ctx // 2,  # Contesto minore per il light

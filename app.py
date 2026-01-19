@@ -100,7 +100,9 @@ with st.sidebar:
 
     st.divider()
     if st.button("Reset Session", type="primary", use_container_width=True):
-        st.session_state.messages = []
+        st.session_state.messages = [
+            {"role": "assistant", "content": "Sistema operativo. Attendo istruzioni."}
+        ]
         st.rerun()
 
 # Main Interface
@@ -176,14 +178,33 @@ if prompt := st.chat_input("Digita una richiesta..."):
             st.caption("_Quick Reply via Light Core_")
 
         # Streaming
-        full_response = st.write_stream(
-            engine.stream_chat(
+        # Streaming manuale per gestire interruzioni (Stop button)
+        placeholder = st.empty()
+        full_response = ""
+
+        try:
+            stream = engine.stream_chat(
                 st.session_state.messages[:-1]
                 + [{"role": "user", "content": full_input}],
                 model_type=model_type,
             )
-        )
 
-        st.session_state.messages.append(
-            {"role": "assistant", "content": full_response}
-        )
+            for chunk in stream:
+                full_response += chunk
+                placeholder.markdown(full_response + "▌")
+
+            placeholder.markdown(full_response)
+
+        except Exception:
+            # Caso interruzione utente o errore
+            pass
+
+        finally:
+            # Salvataggio garantito anche se interrotto
+            if full_response:
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": full_response}
+                )
+            else:
+                # Se non ha generato nulla (crash immediato?), puliamo il placeholder
+                placeholder.empty()

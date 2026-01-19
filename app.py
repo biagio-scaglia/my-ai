@@ -16,36 +16,86 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS per look premium (Dark Mode friendly)
+# Custom CSS per look premium (Dark Mode friendly) & Sidebar Fix
 st.markdown(
     """
 <style>
-    /* Nasconde menu hamburger e footer standard */
+    /* RESET BASE */
+    .stApp {
+        background-color: #0E1117;
+    }
+    
+    /* HEADER & SIDEBAR FIX */
+    /* Non nascondiamo più l'header globale per permettere l'uso dell'hamburger menu */
+    header[data-testid="stHeader"] {
+        background: transparent;
+        z-index: 100;
+    }
+    
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #161B22; /* Github Dark Dimmed Style */
+        border-right: 1px solid #30363D;
+    }
+    
+    /* CHAT MESSAGES REDESIGN */
+    .stChatMessage {
+        background-color: transparent;
+        border: none;
+    }
+    
+    /* User Message Bubble */
+    .stChatMessage[data-testid="stChatMessage"]:nth-child(odd) div[data-testid="stMarkdownContainer"] {
+        background-color: #238636; /* Green accent */
+        color: white;
+        padding: 15px;
+        border-radius: 20px 20px 5px 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-align: right;
+        margin-left: 20%;
+    }
+    
+    /* AI Message Bubble */
+    .stChatMessage[data-testid="stChatMessage"]:nth-child(even) div[data-testid="stMarkdownContainer"] {
+        background-color: #1F2428; /* Dark card */
+        color: #E6EDF3;
+        padding: 15px;
+        border-radius: 20px 20px 20px 5px;
+        border: 1px solid #30363D;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-right: 10%;
+    }
+    
+    /* INPUT FIELD FLOATING */
+    .stTextInput {
+        position: fixed;
+        bottom: 30px;
+        left: 50%; 
+        transform: translateX(-50%);
+        width: 80%; /* Mobile width */
+        max-width: 800px;
+        z-index: 999;
+    }
+    
+    /* Adjust input styling */
+    .stTextInput input {
+        background-color: #0D1117;
+        color: #C9D1D9;
+        border-radius: 25px;
+        border: 1px solid #30363D;
+        padding: 10px 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    
+    /* HIDE DEFAULT ELEMENTS (Footer only) */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;} /* Nasconde barra colorata in alto */
     
-    /* Stile Chat Message per renderlo più "App Native" */
-    .stChatMessage {
-        background-color: #262730;
-        border-radius: 12px;
-        border: 1px solid #3E3E3E;
-    }
-    .stChatMessage[data-testid="stChatMessage"]:nth-child(odd) {
-        background-color: #1E1E1E;
-    }
-    
-    /* Input field più pulito */
-    .stTextInput input {
-        border-radius: 12px;
-        background-color: #2D2D2D;
-        color: #E0E0E0;
-        border: 1px solid #444;
-    }
-    
-    /* Sidebar scura */
-    section[data-testid="stSidebar"] {
-        background-color: #0E1117;
+    /* RESPONSIVE TWEAKS */
+    @media (min-width: 768px) {
+        .stTextInput {
+            width: 60%;
+        }
     }
 </style>
 """,
@@ -83,25 +133,36 @@ def load_engine():
 
 # Layout Sidebar - Monitoraggio
 with st.sidebar:
-    st.header("🔮 System Status")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric(label="Thinker", value="ON", delta="1.5B")
-    with col2:
-        st.metric(label="Speed", value="ON", delta="0.5B")
-
-    st.caption("🧠 RAG Memory: Active")
+    st.image(
+        "https://img.icons8.com/3d-fluency/94/brain.png", width=60
+    )  # Placeholder Icon
+    st.title("Coddy AI")
+    st.caption("v2.1 Godmode Enhanced")
 
     st.divider()
 
-    st.subheader("Configuration")
-    enable_online = st.checkbox("Web Access", value=False)
+    with st.expander("⚡ System Status", expanded=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Thinker", "ON", delta="1.5B", delta_color="normal")
+        with col2:
+            st.metric("Speed", "ON", delta="0.5B", delta_color="normal")
+        st.progress(100, "Neural Mesh Active")
 
     st.divider()
-    if st.button("Reset Session", type="primary", use_container_width=True):
+
+    st.subheader("Control Center")
+    enable_online = st.toggle("🌍 Web Access", value=False)
+
+    st.divider()
+
+    # Bottom Action
+    if st.button("🗑️ Clear Chat", type="primary", use_container_width=True):
         st.session_state.messages = [
-            {"role": "assistant", "content": "Sistema operativo. Attendo istruzioni."}
+            {
+                "role": "assistant",
+                "content": "Riavvio sistema completato. Attendo input.",
+            }
         ]
         st.rerun()
 

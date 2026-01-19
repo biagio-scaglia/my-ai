@@ -38,14 +38,13 @@ st.markdown(
         border-right: 1px solid #30363D;
     }
     
-    /* CHAT MESSAGES REDESIGN - REVERTED TO CLASSIC */
+    /* CHAT MESSAGES - UNIFIED CARD STYLE */
     .stChatMessage {
         background-color: #262730;
         border-radius: 12px;
         border: 1px solid #3E3E3E;
-    }
-    .stChatMessage[data-testid="stChatMessage"]:nth-child(odd) {
-        background-color: #1E1E1E;
+        /* Ensure distinct separation */
+        margin-bottom: 10px;
     }
     
     /* INPUT FIELD FLOATING */

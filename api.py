@@ -6,8 +6,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Optional
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, ORJSONResponse
 import json
+from loguru import logger
 
 # Ensure we can import modules from current directory
 sys.path.append(os.getcwd())
@@ -20,7 +21,7 @@ rag = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global engine, rag
-    print("Booting Neural Core...")
+    logger.info("Booting Neural Core...")
     try:
         from engine_cpp import CoddyEngine2
         from rag_engine import RagEngine
@@ -31,9 +32,9 @@ async def lifespan(app: FastAPI):
         # Init Engine
         engine = CoddyEngine2()
         engine.start()
-        print("Systems Online.")
+        logger.success("Systems Online.")
     except Exception as e:
-        print(f"Error starting engines: {e}")
+        logger.error(f"Error starting engines: {e}")
 
     yield
 
@@ -53,6 +54,7 @@ app = FastAPI(
     description="API for Coddy AI Engine",
     version="2.0",
     lifespan=lifespan,
+    default_response_class=ORJSONResponse,
 )
 
 # CORS to allow frontend communication
@@ -103,7 +105,7 @@ def stream_generator(messages, use_web):
                 context_parts.append("=== WEB RESULTS ===")
                 context_parts.extend(web_results)
         except Exception as e:
-            print(f"Web search error: {e}")
+            logger.warning(f"Web search error: {e}")
 
     # Build full input
     full_input = user_query

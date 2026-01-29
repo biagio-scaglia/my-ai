@@ -3,6 +3,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane, FaRobot, FaUser, FaTerminal, FaEraser } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import useSWR from 'swr';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 type Message = {
   role: 'user' | 'assistant';
@@ -11,6 +20,7 @@ type Message = {
 
 export default function ChatInterface() {
   const [mounted, setMounted] = useState(false);
+  const { data: healthData, error: healthError } = useSWR('http://localhost:8000/health', fetcher, { refreshInterval: 5000 });
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Systems online.\nMemory Banks: ACTIVE\nNeural Engine: READY\n\nHow can I assist you today, Biagio?" }
   ]);
@@ -109,11 +119,11 @@ export default function ChatInterface() {
       <div className="h-14 px-6 border-b border-white/5 bg-white/5 flex items-center justify-between">
          <div className="flex items-center gap-3">
              <div className="flex gap-2">
-                 <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                 <div className={cn("w-3 h-3 rounded-full", healthData ? "bg-green-500" : "bg-red-500/50")} title={healthData ? "Online" : "Offline"} />
                  <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                  <div className="w-3 h-3 rounded-full bg-green-500/50" />
              </div>
-             <span className="ml-4 font-mono text-xs text-[#666]">user@coddy-ai:~/session</span>
+             <span className="ml-4 font-mono text-xs text-[#666]">user@coddy-ai:~/session {healthData ? '(Connected)' : '(Offline)'}</span>
          </div>
          <button onClick={clearChat} className="text-[#666] hover:text-white transition-colors" title="Clear History">
              <FaEraser />
@@ -135,8 +145,10 @@ export default function ChatInterface() {
               className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
             >
               {/* Avatar */}
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border 
-                  ${msg.role === 'user' ? 'bg-[#00f2ff]/10 border-[#00f2ff]/30 text-[#00f2ff]' : 'bg-[#fff]/5 border-[#fff]/10 text-[#fff]'}`}>
+              <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center shrink-0 border",
+                  msg.role === 'user' ? 'bg-[#00f2ff]/10 border-[#00f2ff]/30 text-[#00f2ff]' : 'bg-[#fff]/5 border-[#fff]/10 text-[#fff]'
+              )}>
                   {msg.role === 'user' ? <FaUser size={14} /> : <FaRobot size={16} />}
               </div>
 
@@ -145,10 +157,12 @@ export default function ChatInterface() {
                   <span className={`text-xs mb-1 font-mono opacity-50 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                       {msg.role === 'user' ? 'YOU' : 'AI CORE'}
                   </span>
-                  <div className={`p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-lg backdrop-blur-md
-                      ${msg.role === 'user' 
+                  <div className={cn(
+                      "p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-lg backdrop-blur-md",
+                      msg.role === 'user' 
                         ? 'bg-gradient-to-br from-[#00f2ff]/20 to-[#00a8ff]/20 border border-[#00f2ff]/30 text-white rounded-tr-none' 
-                        : 'bg-[#1a1a24] border border-white/5 text-[#d0d0d0] rounded-tl-none font-mono'}`}>
+                        : 'bg-[#1a1a24] border border-white/5 text-[#d0d0d0] rounded-tl-none font-mono'
+                  )}>
                      {msg.content}
                   </div>
               </div>
@@ -176,8 +190,10 @@ export default function ChatInterface() {
              <button 
                 onClick={sendMessage}
                 disabled={isLoading || !input.trim()}
-                className={`ml-4 p-2 rounded-full transition-all duration-300
-                    ${input.trim() ? 'bg-[#00f2ff] text-black rotate-0 opacity-100 hover:scale-110' : 'bg-[#333] text-[#555] -rotate-45 opacity-50 cursor-not-allowed'}`}
+                className={cn(
+                    "ml-4 p-2 rounded-full transition-all duration-300",
+                    input.trim() ? 'bg-[#00f2ff] text-black rotate-0 opacity-100 hover:scale-110' : 'bg-[#333] text-[#555] -rotate-45 opacity-50 cursor-not-allowed'
+                )}
              >
                 <FaPaperPlane size={14} />
              </button>

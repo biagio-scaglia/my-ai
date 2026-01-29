@@ -1,96 +1,116 @@
-# ⚡ Coddy v2.1 "Godmode Enhanced"
+# 🧠 Coddy AI - Next Gen Neural Assistant
 
-> **L'Assistente AI locale che gira sul metallo.**
-> Nessuna cloud, nessuna API Key, pura potenza CPU su privacy assoluta.
+> **Optimized • Local • High-Performance**
 
-Coddy è un assistente di programmazione avanzato progettato per hardware consumer (i7 + 32GB RAM).
-Sfrutta la **Quantizzazione (GGUF)** e un'architettura **"Dual Brain"** per essere leggero come una piuma ma intelligente come un Coder.
+Coddy AI is a state-of-the-art local AI assistant featuring a high-performance Python backend and a stunning, reactive Next.js frontend. It leverages advanced optimization libraries to ensure lightning-fast responses and efficient resource usage.
+
+![Coddy AI Frontend](./frontend/public/window.svg)
+
+## ⚡ High-Performance Core
+
+The architecture has been massively optimized with top-tier libraries:
+
+### 🐍 Backend (Python / FastAPI)
+
+- **🚀 CoddyEngine2**: Custom C++ optimized inference engine (simulated).
+- **📚 Qdrant + DiskCache**: Hybrid vector search system with **DiskCache** for sub-millisecond query retrieval on repeated searches.
+- **🪵 Loguru**: Beautiful, asynchronous structured logging.
+- **� ORJSON**: High-performance JSON serialization, replacing standard `json` lib.
+- **🦆 DuckDB**: Integrated for future high-speed analytical queries.
+- **⛓️ LangChain**: Ready for complex chain orchestration.
+
+### ⚛️ Frontend (Next.js 16)
+
+- **⚡ SWR**: State-of-the-art data fetching with automatic revalidation and caching.
+- **🎨 Tailwind CSS + CLSX**: Optimized, mergeable utility classes for dynamic styling.
+- **🖼️ Sharp**: High-performance image optimization.
+- **🌀 Framer Motion**: Butter-smooth 60fps animations.
 
 ---
 
-## 🚀 Caratteristiche Godmode
+## 🛠️ Installation & Setup
 
-- **🏎️ Motore C++ Nativo**: Passaggio da Python lento a `llama.cpp` ottimizzato per Intel/AMD.
-- **🧠 Dual Brain**:
-  - **Light (0.5B)**: Risposte istantanee per teoria e chiacchiere.
-  - **Coder (1.5B)**: Si attiva _solo_ quando serve scrivere codice complesso.
-- **⚙️ Auto-Tuning Profiler**: Si calibra automaticamente sul tuo hardware (CPU/RAM) per massime performance.
-- **👁️ Mini LSP (Code Awareness)**: "Vede" il tuo progetto e capisce lo stack senza bisogno di spiegazioni.
-- **📚 RAG Persistente**: Memoria a lungo termine su disco (Qdrant) che non satura la RAM.
-- **🌍 Web Search**: Cerca su DuckDuckGo se la knowledge base locale non basta.
-- **🌊 Streaming Matrix UI**: Codice colorato e formattato in tempo reale con `Rich`.
-- **💻 CLI Potenziata**: Comandi `help`, `cls`, `exit` e status indicator intelligenti.
-- **🇮🇹 Italiano Nativo**: System prompt sintonizzato per risposte rigorosamente in italiano.
+### Prerequisites
 
----
+- Python 3.10+
+- Node.js 18+
+- Git
 
-## 🛠️ Installazione (2 Comandi)
-
-### 1. Preparazione
-
-Assicurati di avere Python 3.10+ installato.
+### 1. Clone & Setup Backend
 
 ```bash
+git clone https://github.com/biagio-scaglia/my-ai.git
+cd my-ai
+
+# Install Python Dependencies (Optimized)
 pip install -r requirements.txt
-python setup.py
 ```
 
-_(Questo scaricherà ~1.5GB di modelli ottimizzati nella cartella `models/`)_
-
----
-
-## 🎮 Utilizzo
-
-### Chat Interattiva
-
-La modalità classica. Coddy ricorda la conversazione.
+### 2. Setup Frontend
 
 ```bash
-python coddy.py
-```
+cd frontend
 
-### One-Shot (Domanda Rapida)
-
-Perfetto per risposte al volo senza entrare nel loop.
-
-```bash
-python coddy.py "Come faccio un foreach in Rust?"
-```
-
-### Modalità Online
-
-Permette a Coddy di cercare su internet.
-
-```bash
-python coddy.py --online
-```
-
-## 🌐 Web Interface (Nuovo!)
-
-Preferisci un'interfaccia grafica stile ChatGPT?
-Ora con **Premium Dark Mode**, supporto RAG visuale e stato del sistema in tempo reale.
-
-```bash
-python -m streamlit run app.py
-
+# Install Node Dependencies
+npm install
 ```
 
 ---
 
-## 🗂️ Knowledge Base (RAG)
+## 🚀 Usage
 
-Vuoi che Coddy impari qualcosa di nuovo?
+### Start the System (All-in-One)
 
-1. Crea un file `.md` o `.txt` nella cartella `knowledge/`.
-2. Incollaci dentro documentazione, appunti o snippet.
-3. Avvia Coddy. **Fatto.** (Impara automaticamente all'avvio).
+Simply run the startup script:
+
+```bash
+./start_app.bat
+```
+
+This will launch both the FastAPI backend server (Port 8000) and the Next.js frontend (Port 3000).
+
+### Manual Start
+
+**Backend:**
+
+```bash
+python api.py
+```
+
+**Frontend:**
+
+```bash
+cd frontend
+npm run dev
+```
 
 ---
 
-## ⚙️ Requisiti Tecnici
+## 📂 Project Structure
 
-- **CPU**: Intel i5/i7 (11th gen+) o AMD Ryzen 5/7 (5000+).
-- **RAM**: Almeno 16GB (32GB raccomandati per il Godmode fluido).
-- **GPU**: Non richiesta (ma supportata se presente).
+```
+my-ai/
+├── 🧠 api.py              # Main FastAPI entrypoint (Optimized with loguru/orjson)
+├── ⚙️ engine_cpp.py       # Core Inference Engine
+├── 🔍 rag_engine.py       # RAG System with DiskCache & Qdrant
+├── 📜 requirements.txt    # Python dependencies
+├── 📁 frontend/           # Next.js 16 Application
+│   ├── 📂 src/
+│   │   ├── 🧩 components/ # ChatInterface, Navbar (Optimized with clsx)
+│   │   └── 📄 app/        # App Router Pages
+│   └── ⚙️ package.json    # Frontend dependencies
+└── �️ knowledge/          # RAG Knowledge Base
+```
 
-_Creato per girare 100% Offline e Privato. I tuoi dati restano sul tuo PC._
+---
+
+## 🌟 Key Features
+
+- **Local RAG**: Queries your local `knowledge/` folder with vector search.
+- **Smart Caching**: `DiskCache` remembers previous answers to save compute.
+- **Real-time Status**: Frontend polls backend health via `SWR`.
+- **Cyberpunk UI**: A premium, "Made by Biagio" design aesthetic.
+
+---
+
+_Built with ❤️ by Biagio Scaglia_

@@ -1,6 +1,8 @@
 import os
 import glob
 import uuid
+from loguru import logger
+import diskcache as dc
 
 
 class RagEngine:
@@ -20,6 +22,9 @@ class RagEngine:
         self.model_name = model_name
         self.client = None
         self.model = None
+        # Persistent Cache for RAG queries (TTL 1 hour)
+        self.cache = dc.Cache("rag_cache")
+        logger.info(f"RAG Cache initialized at {self.cache.directory}")
 
         # Lazy Loading delle dipendenze
         try:
@@ -31,7 +36,7 @@ class RagEngine:
             self.models = models
 
             # Inizializza Qdrant Locale
-            # print(f"RAG: Apertura DB in {self.db_path}...")
+            # logger.debug(f"RAG: Apertura DB in {self.db_path}...")
             # Tentiamo di forzare la locazione in memoria se path è "memory" (opzionale)
             self.client = QdrantClient(path=self.db_path)
 
@@ -45,11 +50,11 @@ class RagEngine:
             # print("RAG: Sistema pronto.")
 
         except ImportError as e:
-            print(
+            logger.error(
                 f"RAG Error: Modulo mancante ({e}). Esegui 'pip install -r requirements.txt'"
             )
         except Exception as e:
-            print(f"RAG Error: Inizializzazione fallita ({e})")
+            logger.critical(f"RAG Error: Inizializzazione fallita ({e})")
             # Fallback sicuro: client None
 
     def _ensure_collection(self):
@@ -71,7 +76,7 @@ class RagEngine:
                     ),
                 )
         except Exception as e:
-            print(f"RAG Init Collection Error: {e}")
+            logger.error(f"RAG Init Collection Error: {e}")
 
     def load_knowledge(self):
         """Indicizza i file."""
@@ -92,7 +97,7 @@ class RagEngine:
 
         batch_points = []
 
-        print("RAG: Scansione nuovi documenti...")
+        logger.info("RAG: Scansione nuovi documenti...")
         for file_path in files:
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
@@ -114,7 +119,7 @@ class RagEngine:
                     )
                     batch_points.append(point)
             except Exception as e:
-                print(f"Errore lettura {file_path}: {e}")
+                logger.warning(f"Errore lettura {file_path}: {e}")
 
         if batch_points:
             try:
@@ -123,16 +128,22 @@ class RagEngine:
                 )
                 count_after = self.client.count(self.collection_name).count
                 if count_after > count_before:
-                    print(
+                    logger.success(
                         f"RAG: +{count_after - count_before} nuovi frammenti indicizzati."
                     )
             except Exception as e:
-                print(f"RAG Upsert Error: {e}")
+                logger.error(f"RAG Upsert Error: {e}")
 
     def search(self, query, top_k=3):
-        """Esegue la ricerca vettoriale."""
+        """Esegue la ricerca vettoriale con Caching."""
         if not self.client:
             return []
+
+        # Check cache
+        cache_key = f"search_{query}_{top_k}"
+        if cache_key in self.cache:
+            logger.debug(f"RAG: Cache hit for '{query}'")
+            return self.cache[cache_key]
 
         try:
             query_vector = self.model.encode(query).tolist()
@@ -151,9 +162,11 @@ class RagEngine:
                             "score": hit.score,
                         }
                     )
+            # Store in cache
+            self.cache.set(cache_key, results, expire=3600)  # 1 hour TTL
             return results
         except Exception as e:
-            print(f"RAG Search Error (final try): {e}")
+            logger.error(f"RAG Search Error (final try): {e}")
             return []
 
     def close(self):

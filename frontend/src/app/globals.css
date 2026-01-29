@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #050510;
+  --foreground: #e0e0e0;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  overflow-x: hidden;
+}
+
+@layer utilities {
+    .glass {
+        @apply backdrop-blur-md bg-white/5 border border-white/10 shadow-xl;
+    }
+    
+    .text-glow {
+        text-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+    }
+}

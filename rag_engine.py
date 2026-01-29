@@ -137,9 +137,6 @@ class RagEngine:
         try:
             query_vector = self.model.encode(query).tolist()
 
-            # --- FIX CRITICO ---
-            # QdrantClient su alcune versioni/config locali potrebbe non esporre .search
-            # Usiamo query_points che è l'API standard più robusta
             search_result = self.client.query_points(
                 collection_name=self.collection_name, query=query_vector, limit=top_k
             ).points
